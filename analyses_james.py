@@ -43,7 +43,7 @@ for sentence in doc.sents:
     count = count + 1
     #print(sentence)
 
-avg_per_sentence = NO_OF_TOKENS/count
+avg_per_sentence = len(word_tokens)/count
 print(avg_per_sentence)
 
 # avg word length
@@ -56,7 +56,7 @@ print(np.mean(word_length))
 pos_tags = [token.tag_ for token in tokens]
 #print(pos_tags)
 top_ten = Counter(pos_tags)
-#print(top_ten)
+print(top_ten)
 
 # Get universal POS tags
 def get_universal_pos(tokens, fine):
@@ -65,7 +65,7 @@ def get_universal_pos(tokens, fine):
 
 # search by fine-grained (for multiple universal tags, just do counter on specified fine-grained list and got top occurence)
 uni = get_universal_pos(tokens, 'VBN')
-print(uni)
+# print(uni)
 print(Counter(uni))
 
 # relative tag frequency
@@ -83,7 +83,7 @@ def most_frequent_words(tokens, fine, uni):
 # most freq words examples
 #print(most_frequent_words(tokens, 'DT', 'DET'))
 #print(most_frequent_words(tokens, 'JJ', 'ADJ'))
-#print(most_frequent_words(tokens, 'NNS', 'NOUN'))
+print(most_frequent_words(tokens, 'NNS', 'NOUN'))
 #print(most_frequent_words(tokens, ',', 'PUNCT'))
 #print(most_frequent_words(tokens, '.', 'PUNCT'))
 #print(most_frequent_words(tokens, '_SP', 'SPACE'))

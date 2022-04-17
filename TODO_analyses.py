@@ -9,7 +9,7 @@ from nltk.util import ngrams
 
 nlp = spacy.load('en_core_web_sm')
 file_path = 'data/preprocessed/train/sentences.txt'
-sentences = open(file_path, encoding='utf-8').read()
+lines = open(file_path, encoding='utf-8').read()
 doc = nlp(lines)
 
 # # PART A
@@ -20,12 +20,12 @@ num_words = 0
 words_length = 0
 for sentence in doc.sents:
     words = []
-    num_sentences += 1
+    num_sentences += 1 #count number of sentences
     for token in sentence:
-        words.append(token.text)
-        if not token.is_punct:
-            num_words += 1
-            words_length += len(token)
+        words.append(token.text) #get all words, incl punctuation as tokens
+        if not token.is_punct and token.text != '\n': #exclude punctuation and linebreaks as words
+            num_words += 1 #count number of words
+            words_length += len(token) #count total word lengths
     token_counter.update(words)
 
 num_tokens = sum(token_counter.values())
@@ -41,11 +41,10 @@ WORDtoken = []
 WORDpos = []
 WORDtag = []
 for token in doc:
-    if str(token) not in ['\\','n']:
-        WORDtoken.append(token.text)
-        WORDpos.append(token.pos_)
-        WORDtag.append(token.tag_)
-df2 = pd.DataFrame({"WORDtoken": WORDtoken,"WORDpos": WORDpos,"WORDtag": WORDtag})
+    WORDtoken.append(token.text)
+    WORDpos.append(token.pos_)
+    WORDtag.append(token.tag_)
+df2 = pd.DataFrame({"WORDtoken": WORDtoken,"WORDpos": WORDpos,"WORDtag": WORDtag}) #all results in df2
 
 print(df2['WORDpos'].value_counts().head(10)) #number of tags per POS tag
 print(df2['WORDpos'].value_counts().sum()) #total number of POS tags
@@ -53,49 +52,50 @@ print(df2['WORDpos'].value_counts().sum()) #total number of POS tags
 top10POStags = ['NOUN','PROPN','PUNCT','VERB','ADP','DET','ADJ','AUX','PRON','SPACE']
 for tag in top10POStags:
     print(tag, ': \n')
-    print(df2[df2['WORDpos'] == tag]['WORDtag'].value_counts())
-    print(df2[df2['WORDpos'] == tag]['WORDtoken'].value_counts().head(3))
-    print(df2[df2['WORDpos'] == tag]['WORDtoken'].value_counts().tail(1))
+    print(df2[df2['WORDpos'] == tag]['WORDtoken'].count() / num_tokens) #relative frequency
+    print(df2[df2['WORDpos'] == tag]['WORDtag'].value_counts()) #Finegrained POS tags
+    print(df2[df2['WORDpos'] == tag]['WORDtoken'].value_counts().head(3)) #3 most frequent token with this tag
+    print(df2[df2['WORDpos'] == tag]['WORDtoken'].value_counts().tail(1)) #least frequent token with this tag
 
 # 3. N-grams -----------------------------------------------------------------------------------------------------------
 doc_str = str(doc)
-all_sentences = doc_str.split("\n")
+all_sentences = doc_str.split("\n") #extract sentences from doc
 
-for n in [2,3]:
+for n in [2,3]: #functions say bigrams, but are ngrams for n=2,3
     bigrams_counter = Counter()
     bigrams = []
     for line in all_sentences:
-        token = nltk.word_tokenize(line)
-        bigram = list(ngrams(token, n))
+        token = nltk.word_tokenize(line) #tokenize using nltk
+        bigram = list(ngrams(token, n)) #nltk ngrams function gets ngrams from sentence
         for gram in bigram:
             bigrams.append(gram)
 
-    bigrams_counter.update(bigrams)
-    bigramstop3 = bigrams_counter.most_common(3)
+    bigrams_counter.update(bigrams) #count number of ngrams
+    bigramstop3 = bigrams_counter.most_common(3) #3 most common ngrams
     print(bigramstop3)
     for bigram in bigramstop3:
         for word in (bigram[0]):
-            print(nltk.pos_tag([word]))
+            print(nltk.pos_tag([word])) #print POS-tags for 3 most common ngrams
 
 # 4. Lemmatization -----------------------------------------------------------------------------------------------------
 LEMtoken = []
 LEMpos = []
 LEMlem = []
 for token in doc:
-    if not token.is_punct:
+    if not token.is_punct: #exclude punctuation from lemmatization
         LEMtoken.append(token.text)
         LEMpos.append(token.pos_)
         LEMlem.append(token.lemma_)
-df4 = pd.DataFrame({"LEMtoken": LEMtoken,"LEMpos": LEMpos,"LEMlem": LEMlem})
+df4 = pd.DataFrame({"LEMtoken": LEMtoken,"LEMpos": LEMpos,"LEMlem": LEMlem}) #all results in df4
 
-df4[df4['LEMpos'] == 'VERB']['LEMlem'].value_counts().head(5)
+df4[df4['LEMpos'] == 'VERB']['LEMlem'].value_counts().head(5) #find 5 verbs with common lemma which occurs often
 print(df4[df4['LEMpos'] == 'VERB']['LEMlem'].value_counts().head(5))
-inflections = df4[df4['LEMlem'] == 'say']['LEMtoken'].unique()
+inflections = df4[df4['LEMlem'] == 'say']['LEMtoken'].unique() #unique inflections of lemma 'say' in text
 print(inflections)
 for inflection in inflections:
     for line in all_sentences:
         if inflection in line.split(" "):
-            print(line)
+            print(line) #print the first line with a unique inflection
             break
 
 # 5. NER  --------------------------------------------------------------------------------------------------------------
@@ -104,11 +104,11 @@ NERent = []
 for ent in doc.ents:
     NERtoken.append(ent.text)
     NERent.append(ent.label_)
-df5 = pd.DataFrame({"NERtoken": NERtoken,"NERent": NERent})
+df5 = pd.DataFrame({"NERtoken": NERtoken,"NERent": NERent}) #all results in df5
 
-print(df5.count())
-print(len(df5['NERent'].unique()))
+print(df5.count()) #number of NERs
+print(len(df5['NERtoken'].unique())) #number of different, unique NERs
 
-print(all_sentences[:5])
-print(df5.head(10))
+print(all_sentences[:5]) #print first 5 sentences
+print(df5.head(10)) #compare to the first 10 NERs, which includes all NERs from the first 5 sentences
 
