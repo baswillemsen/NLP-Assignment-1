@@ -41,12 +41,12 @@ if __name__ == '__main__':
     with open(train_path + "labels.txt") as label_file:
         train_labels = label_file.readlines()
 
-
     with open(dev_path + "sentences.txt") as dev_file:
         dev_sentences = dev_file.readlines()
 
     with open(train_path + "labels.txt") as dev_label_file:
         dev_labels = dev_label_file.readlines()
+
     with open(test_path + "sentences.txt") as testfile:
         testinput = testfile.readlines()
 

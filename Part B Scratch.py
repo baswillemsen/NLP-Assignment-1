@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 col_names = ['id', 'sentence', 'target_start', 'target_end', 'target_words', 'num_native', 'num_non_native',
              'difficult_native', 'difficult_non_native', 'label_bin', 'label_prob']
-df = pd.read_csv('data/original/english/WikiNews_Dev.tsv', sep='\t', names=col_names)
+df = pd.read_csv('data/original/english/WikiNews_Train.tsv', sep='\t', names=col_names)
 df.head()
 
 # 7. Extract basic statistics ------------------------------------------------------------------------------------------
@@ -27,8 +27,7 @@ len(df[df['target_words'].str.split(" ").apply(len) > 1])  # Number of instances
 df['target_words'].str.split(" ").apply(len).max()  # Maximum number of tokens for an instance
 
 # 8. Explore linguistic characteristics --------------------------------------------------------------------------------
-df8 = df[(df['target_words'].str.split(" ").apply(len) == 1) & (
-        df['label_bin'] != 0)]  # Filter single tokens, complex by at least 1 annotator, add to df8
+df8 = df[(df['target_words'].str.split(" ").apply(len) == 1) & (df['label_bin'] != 0)]  # Filter single tokens, complex by at least 1 annotator, add to df8
 len(df8)  # number of tokens
 
 
@@ -40,21 +39,28 @@ df8['token_length'] = df8['target_words'].apply(len)  # make a column with the c
 df8['word_freq'] = df8['target_words'].apply(apply_word_freq)  # make a column with the word freq of the target word
 
 target_words_list = df8['target_words'].to_list()
+target_words_list
 target_words_str = ' '.join([str(elem) for elem in target_words_list])
 target_words_str = target_words_str.replace('-', '')  # delete all the '-'s, join words
+target_words_str = target_words_str.replace('.', '')  # delete all the '-'s, join words
+target_words_str = target_words_str.replace('\\', '')  # delete all the '-'s, join words
+target_words_str = target_words_str.replace('/', '')  # delete all the '-'s, join words
+target_words_str = target_words_str.replace('’s', "")  # delete all the '-'s, join words
 
 doc = nlp(target_words_str)
+pos_text = []
 pos_tokens = []
 for token in doc:
+    pos_text.append(token.text)
     pos_tokens.append(token.pos_)
 df8['pos_tag'] = pos_tokens
 print(df8)
 
-print(np.corrcoef(df8['token_length'], df8['label_prob'])[0, 1])  #
-print(np.corrcoef(df8['word_freq'], df8['label_prob'])[0, 1])
+print(np.corrcoef(df8['token_length'], df8['label_prob'])[0, 1])  # corr token length and perceived complexity word
+print(np.corrcoef(df8['word_freq'], df8['label_prob'])[0, 1])  # corr word frequency and perceived complexity word
 
 plt.scatter(df8['token_length'], df8['label_prob'])
-plt.clf()
+plt.clf
 plt.scatter(df8['word_freq'], df8['label_prob'])
 plt.clf()
 plt.scatter(df8['word_freq'], df8['pos_tag'])
