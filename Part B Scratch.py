@@ -1,55 +1,61 @@
 ## Scratch file for experimentation and exploration
 
 import pandas as pd
+
+pd.options.mode.chained_assignment = None  # default='warn'
 from wordfreq import word_frequency
 import matplotlib.pyplot as plt
 
-col_names = ['id','sentence','target_start','target_end','target_words','num_native','num_non_native','difficult_native','difficult_non_native','label_bin','label_prob']
+col_names = ['id', 'sentence', 'target_start', 'target_end', 'target_words', 'num_native', 'num_non_native',
+             'difficult_native', 'difficult_non_native', 'label_bin', 'label_prob']
 df = pd.read_csv('data/original/english/WikiNews_Dev.tsv', sep='\t', names=col_names)
 df.head()
 
 # 7. Extract basic statistics ------------------------------------------------------------------------------------------
-label_bin_0 = len(df[df['label_bin']==0])
-label_bin_1 = len(df[df['label_bin']==1])
+label_bin_0 = len(df[df['label_bin'] == 0])  # Number of instances labeled with 0
+label_bin_1 = len(df[df['label_bin'] == 1])  # Number of instances labeled with 1
 print(label_bin_0, label_bin_1)
 
-label_prob_min = df['label_prob'].min()
-label_prob_max = df['label_prob'].max()
-label_prob_mean = df['label_prob'].mean()
-label_prob_sd = df['label_prob'].std()
-print(label_prob_min, label_prob_max, label_prob_mean, label_prob_sd)
+label_prob_min = df['label_prob'].min()  # min
+label_prob_max = df['label_prob'].max()  # max
+label_prob_median = df['label_prob'].median()  # median
+label_prob_mean = df['label_prob'].mean()  # mean
+label_prob_sd = df['label_prob'].std()  # standard deviation
+print(label_prob_min, label_prob_max, label_prob_median, label_prob_mean, label_prob_sd)
 
-len(df[df['target_words'].str.split(" ").apply(len)>1]
-df['target_words'].str.split(" ").apply(len).max()
+len(df[df['target_words'].str.split(" ").apply(len) > 1])  # Number of instances consisting of more than one token
+df['target_words'].str.split(" ").apply(len).max()  # Maximum number of tokens for an instance
 
 # 8. Explore linguistic characteristics --------------------------------------------------------------------------------
-df2 = df[(df['target_words'].str.split(" ").apply(len)==1) & (df['label_bin']!=0)]
-len(df2)
+df8 = df[(df['target_words'].str.split(" ").apply(len) == 1) & (
+        df['label_bin'] != 0)]  # Filter single tokens, complex by at least 1 annotator, add to df8
+len(df8)  # number of tokens
+
 
 def apply_word_freq(token):
-    return word_frequency(token,'en')
+    return word_frequency(token, 'en')
 
-df2['token_length'] = df2['target_words'].apply(len)
-df2['word_freq'] = df2['target_words'].apply(apply_word_freq)
 
-target_words_list = df2['target_words'].to_list()
+df8['token_length'] = df8['target_words'].apply(len)  # make a column with the character length of the target word
+df8['word_freq'] = df8['target_words'].apply(apply_word_freq)  # make a column with the word freq of the target word
+
+target_words_list = df8['target_words'].to_list()
 target_words_str = ' '.join([str(elem) for elem in target_words_list])
-len(target_words_str)
+target_words_str = target_words_str.replace('-', '')  # delete all the '-'s, join words
 
-doc = nlp(target_words_str)                     ##todo!
+doc = nlp(target_words_str)
 pos_tokens = []
 for token in doc:
-    print(token)
-    print(type(token))
-    if token != '-':
-        pos_tokens.append(token.pos_)
-df2['pos_tag'] = pos_tokens
-pos_tokens
+    pos_tokens.append(token.pos_)
+df8['pos_tag'] = pos_tokens
+print(df8)
 
-print(np.corrcoef(df2['token_length'], df2['label_prob'])[0,1])
-print(np.corrcoef(df2['word_freq'], df2['label_prob'])[0,1])
+print(np.corrcoef(df8['token_length'], df8['label_prob'])[0, 1])  #
+print(np.corrcoef(df8['word_freq'], df8['label_prob'])[0, 1])
 
-plt.scatter(df2['token_length'], df2['label_prob'])
+plt.scatter(df8['token_length'], df8['label_prob'])
 plt.clf()
-plt.scatter(df2['word_freq'], df2['label_prob'])
+plt.scatter(df8['word_freq'], df8['label_prob'])
+plt.clf()
+plt.scatter(df8['word_freq'], df8['pos_tag'])
 plt.clf()

@@ -1,6 +1,11 @@
-numpy
+numpy~=1.22.3
+pandas~=1.4.2
 Pillow
 torch>=1.2
 tabulate
-tqdm
+tqdm~=4.64.0
 spacy=3.2
+spacy~=3.2.4
+nltk~=3.7
+matplotlib~=3.5.1
+wordfreq~=3.0.1
