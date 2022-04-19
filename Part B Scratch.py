@@ -1,10 +1,13 @@
 ## Scratch file for experimentation and exploration
 
+import numpy as np
 import pandas as pd
-
 pd.options.mode.chained_assignment = None  # default='warn'
 from wordfreq import word_frequency
 import matplotlib.pyplot as plt
+import spacy
+nlp = spacy.load("en_core_web_sm")
+
 
 col_names = ['id', 'sentence', 'target_start', 'target_end', 'target_words', 'num_native', 'num_non_native',
              'difficult_native', 'difficult_non_native', 'label_bin', 'label_prob']
@@ -39,7 +42,6 @@ df8['token_length'] = df8['target_words'].apply(len)  # make a column with the c
 df8['word_freq'] = df8['target_words'].apply(apply_word_freq)  # make a column with the word freq of the target word
 
 target_words_list = df8['target_words'].to_list()
-target_words_list
 target_words_str = ' '.join([str(elem) for elem in target_words_list])
 target_words_str = target_words_str.replace('-', '')  # delete all the '-'s, join words
 target_words_str = target_words_str.replace('.', '')  # delete all the '-'s, join words
