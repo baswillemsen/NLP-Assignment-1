@@ -29,7 +29,7 @@ def majority_baseline(train_input, train_labels, data_input, data_labels):
     df_majority['predictions'] = predictions
     accuracy = sum(df_majority['labels'] == df_majority['predictions']) / len(df_majority)
 
-    return accuracy, predictions
+    return df_majority, accuracy
 
 
 # Random baseline ------------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ def random_baseline(train_input, train_labels, data_input, data_labels):
     df_random['predictions'] = predictions
     accuracy = sum(df_random['labels'] == df_random['predictions']) / len(df_random)
 
-    return accuracy, predictions
+    return df_random, accuracy
 
 
 # Length baseline ------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ def length_baseline(train_input, train_labels, data_input, data_labels):
     df_length['predictions'] = predictions
     accuracy = sum(df_length['labels'] == df_length['predictions']) / len(df_length)
 
-    return accuracy, predictions
+    return df_length, accuracy
 
 
 # Frequency baseline ---------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def frequency_baseline(train_input, train_labels, data_input, data_labels):
     df_frequency['predictions'] = predictions
     accuracy = sum(df_frequency['labels'] == df_frequency['predictions']) / len(df_frequency)
 
-    return accuracy, predictions
+    return df_frequency, accuracy
 
 
 # Run the models -------------------------------------------------------------------------------------------------------
@@ -108,15 +108,15 @@ if __name__ == '__main__':
         dev_labels = dev_label_file.readlines()
 
 print('Accuracy on dev: \n')
-majority_accuracy_dev, majority_predictions_dev = majority_baseline(train_input, train_labels, dev_input, dev_labels)
-random_accuracy_dev, random_predictions_dev = random_baseline(train_input, train_labels, dev_input, dev_labels)
-length_accuracy_dev, length_predictions_dev = length_baseline(train_input, train_labels, dev_input, dev_labels)
-frequency_accuracy_dev, frequency_predictions_dev = frequency_baseline(train_input, train_labels, dev_input, dev_labels)
+df_majority_dev, majority_accuracy_dev = majority_baseline(train_input, train_labels, dev_input, dev_labels)
+df_random_dev, random_accuracy_dev = random_baseline(train_input, train_labels, dev_input, dev_labels)
+df_length_dev, length_accuracy_dev = length_baseline(train_input, train_labels, dev_input, dev_labels)
+df_frequency_dev, frequency_accuracy_dev = frequency_baseline(train_input, train_labels, dev_input, dev_labels)
 print(f'{majority_accuracy_dev:.2f}', f'{random_accuracy_dev:.2f}', f'{length_accuracy_dev:.2f}', f'{frequency_accuracy_dev:.2f}')
 
 print('Accuracy on test: \n')
-majority_accuracy_test, majority_predictions_test = majority_baseline(train_input, train_labels, test_input, test_labels)
-random_accuracy_test, random_predictions_test = random_baseline(train_input, train_labels, test_input, test_labels)
-length_accuracy_test, length_predictions_test = length_baseline(train_input, train_labels, test_input, test_labels)
-frequency_accuracy_test, frequency_predictions_test = frequency_baseline(train_input, train_labels, test_input, test_labels)
+df_majority_test, majority_accuracy_test = majority_baseline(train_input, train_labels, test_input, test_labels)
+df_random_test, random_accuracy_test = random_baseline(train_input, train_labels, test_input, test_labels)
+df_length_test, length_accuracy_test = length_baseline(train_input, train_labels, test_input, test_labels)
+df_frequency_test, frequency_accuracy_test = frequency_baseline(train_input, train_labels, test_input, test_labels)
 print(f'{majority_accuracy_test:.2f}', f'{random_accuracy_test:.2f}', f'{length_accuracy_test:.2f}', f'{frequency_accuracy_test:.2f}')
