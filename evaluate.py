@@ -48,14 +48,20 @@ def evaluate(model, loss_fn, data_iterator, metrics, num_steps):
         output_batch = output_batch.data.cpu().numpy()
         labels_batch = labels_batch.data.cpu().numpy()
 
-        # compute all metrics on this batch
-        summary_batch = {metric: metrics[metric](output_batch, labels_batch)
-                         for metric in metrics}
+        # changed this dictionary to work with dynamically paramterized metric functions
+        summary_batch = {}
+        
+        # compute all metrics on this batch and set complex=False to get metrics for non-complex class (N)
+        for metric in metrics:
+            if metric == 'accuracy':
+                summary_batch[metric] = metrics[metric](output_batch, labels_batch)
+            else:
+                summary_batch[metric] = metrics[metric](output_batch, labels_batch, complex=False)
         summary_batch['loss'] = loss.item()
         summ.append(summary_batch)
 
-    # compute mean of all metrics in summary
-    metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
+    # compute mean of all metrics in summary (modified to change N/A values in metrics to 0 (due to division by zero))
+    metrics_mean = {metric:np.mean([x[metric] if x[metric] != 'N/A' else 0 for x in summ]) for metric in summ[0]} 
     metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
     logging.info("- Eval metrics : " + metrics_string)
     return metrics_mean
@@ -137,7 +143,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     json_path = os.path.join(args.model_dir, 'params.json')
     assert os.path.isfile(json_path), "No json configuration file found at {}".format(json_path)
-    params = utils.Params(json_path)
+    params = utils.Params(json_path) # params such as learning_rate, batch size, num_epochs
 
     # use GPU if available
     params.cuda = torch.cuda.is_available()     # use GPU is available

@@ -46,36 +46,52 @@ for token in doc:
     WORDtag.append(token.tag_)
 df2 = pd.DataFrame({"WORDtoken": WORDtoken,"WORDpos": WORDpos,"WORDtag": WORDtag}) #all results in df2
 
-print(df2['WORDpos'].value_counts().head(10)) #number of tags per POS tag
-print(df2['WORDpos'].value_counts().sum()) #total number of POS tags
+print(df2['WORDtag'].value_counts().head(10)) #number of tags per POS tag
+print(df2['WORDtag'].value_counts().sum()) #total number of POS tags
 
-top10POStags = ['NOUN','PROPN','PUNCT','VERB','ADP','DET','ADJ','AUX','PRON','SPACE']
+top10POStags = ['NN','NNP','IN','DT','JJ','NNS',',','VBD','.','_SP']
 for tag in top10POStags:
     print(tag, ': \n')
-    print(df2[df2['WORDpos'] == tag]['WORDtoken'].count() / num_tokens) #relative frequency
-    print(df2[df2['WORDpos'] == tag]['WORDtag'].value_counts()) #Finegrained POS tags
-    print(df2[df2['WORDpos'] == tag]['WORDtoken'].value_counts().head(3)) #3 most frequent token with this tag
-    print(df2[df2['WORDpos'] == tag]['WORDtoken'].value_counts().tail(1)) #least frequent token with this tag
+    print(df2[df2['WORDtag'] == tag]['WORDtoken'].count() / num_tokens) #relative frequency
+    print(df2[df2['WORDtag'] == tag]['WORDtag'].value_counts()) #Finegrained POS tags
+    print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().head(3)) #3 most frequent token with this tag
+    print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().tail(1)) #least frequent token with this tag
 
 # 3. N-grams -----------------------------------------------------------------------------------------------------------
-doc_str = str(doc)
-all_sentences = doc_str.split("\n") #extract sentences from doc
+def get_ngrams(doc, n, filter_punct=False, use_pos=False):
+    counter = 1
+    ngrams = []
+    el = ''
+    for token in doc:
+        if token.is_punct and filter_punct == True:
+            continue
+        if counter % n != 0:
+            counter = counter + 1
+            if use_pos:
+                el = el + token.tag_ + ' '
+            else:
+                el = el + token.text + ' '
+        else:
+            counter = 1
+            if use_pos:
+                el = el + token.tag_
+            else:
+                el = el + token.text
+            ngrams.append(el)
+            el = ''
+    return ngrams
 
-for n in [2,3]: #functions say bigrams, but are ngrams for n=2,3
-    bigrams_counter = Counter()
-    bigrams = []
-    for line in all_sentences:
-        token = nltk.word_tokenize(line) #tokenize using nltk
-        bigram = list(ngrams(token, n)) #nltk ngrams function gets ngrams from sentence
-        for gram in bigram:
-            bigrams.append(gram)
+bigrams = list(get_ngrams(doc, 2, filter_punct=False))
+trigrams = list(get_ngrams(doc, 3, filter_punct=False))
+bigrams_pos = list(get_ngrams(doc, 2, use_pos=True))
+trigrams_pos = list(get_ngrams(doc, 3, use_pos=True))
 
-    bigrams_counter.update(bigrams) #count number of ngrams
-    bigramstop3 = bigrams_counter.most_common(3) #3 most common ngrams
-    print(bigramstop3)
-    for bigram in bigramstop3:
-        for word in (bigram[0]):
-            print(nltk.pos_tag([word])) #print POS-tags for 3 most common ngrams
+# n-gram occurences
+print(Counter(bigrams))
+print(Counter(trigrams))
+# pos n-gram occurences
+print(Counter(bigrams_pos))
+print(Counter(trigrams_pos))
 
 # 4. Lemmatization -----------------------------------------------------------------------------------------------------
 LEMtoken = []

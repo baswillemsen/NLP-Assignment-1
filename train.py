@@ -68,18 +68,24 @@ def train(model, optimizer, loss_fn, data_iterator, metrics, params, num_steps):
             output_batch = output_batch.data.cpu().numpy()
             labels_batch = labels_batch.data.cpu().numpy()
 
-            # compute all metrics on this batch
-            summary_batch = {metric: metrics[metric](output_batch, labels_batch)
-                             for metric in metrics}
+            # changed this dictionary to work with dynamically paramterized metric functions
+            summary_batch = {}
+            
+            # compute all metrics on this batch and set complex=False to get metrics for non-complex class (N)
+            for metric in metrics:
+                if metric == 'accuracy':
+                    summary_batch[metric] = metrics[metric](output_batch, labels_batch)
+                else:
+                    summary_batch[metric] = metrics[metric](output_batch, labels_batch, complex=False)
             summary_batch['loss'] = loss.item()
             summ.append(summary_batch)
 
         # update the average loss
         loss_avg.update(loss.item())
         t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
-
-    # compute mean of all metrics in summary
-    metrics_mean = {metric: np.mean([x[metric]
+    
+    # compute mean of all metrics in summary (modified to change N/A values in metrics to 0 (due to division by zero))
+    metrics_mean = {metric: np.mean([x[metric] if x[metric] != 'N/A' else 0 
                                      for x in summ]) for metric in summ[0]}
     metrics_string = " ; ".join("{}: {:05.3f}".format(k, v)
                                 for k, v in metrics_mean.items())

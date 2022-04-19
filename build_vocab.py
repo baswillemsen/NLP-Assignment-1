@@ -24,7 +24,7 @@ def save_vocab_to_txt_file(vocab, txt_path):
         vocab: (iterable object) yields token
         txt_path: (stirng) path to vocab file
     """
-    with open(txt_path, "w") as f:
+    with open(txt_path, "w", encoding="utf-8") as f:
         for token in vocab:
             f.write(token + '\n')
             
@@ -36,11 +36,13 @@ def save_dict_to_json(d, json_path):
         d: (dict)
         json_path: (string) path to json file
     """
-    with open(json_path, 'w') as f:
+    with open(json_path, 'w', encoding="utf-8") as f:
         d = {k: v for k, v in d.items()}
         json.dump(d, f, indent=4)
 
-
+# this function passes the Counter() object into the vocab variable
+# and then calls this object's update() method to update the current
+# token count with the next line of the sentence
 def update_vocab(txt_path, vocab):
     """Update word and tag vocabulary from dataset
 
@@ -51,13 +53,15 @@ def update_vocab(txt_path, vocab):
     Returns:
         dataset_size: (int) number of elements in the dataset
     """
-    with open(txt_path) as f:
+    with open(txt_path, encoding="utf-8") as f:
         for i, line in enumerate(f):
             vocab.update(line.strip().split(' '))
-
     return i + 1
 
-
+# build vocab puts words in words.txt (same for tags.txt) and this is later used to convert input for the LSTM
+# as indexed elements. If a word is not in words.txt it's set as an UNK tag. A PAD token is always added
+# at the end of each input sentence. I think the PAD is to make all inputs the same size for the model, but 
+# the evaluation functions will skip this so it won't matter
 if __name__ == '__main__':
     args = parser.parse_args()
 
@@ -83,6 +87,8 @@ if __name__ == '__main__':
     assert size_test_sentences == size_test_tags
 
     # Only keep most frequent tokens
+    # if some word/tag count falls below the min_count threshold, then do not save it
+    # to the below lists
     words = [tok for tok, count in words.items() if count >= args.min_count_word]
     tags = [tok for tok, count in tags.items() if count >= args.min_count_tag]
 
