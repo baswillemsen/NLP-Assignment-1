@@ -13,6 +13,9 @@ file_path = 'data/preprocessed/train/sentences.txt'
 lines = open(file_path, encoding='utf-8').read()
 doc = nlp(lines)
 
+doc_str = str(doc)
+all_sentences = doc_str.split("\n")
+
 # # PART A
 # 1. Tokanization ------------------------------------------------------------------------------------------------------
 token_counter = Counter()
@@ -54,7 +57,7 @@ top10POStags = ['NN','NNP','IN','DT','JJ','NNS',',','VBD','.','_SP']
 for tag in top10POStags:
     print(tag, ': \n')
     print(df2[df2['WORDtag'] == tag]['WORDtoken'].count() / num_tokens) #relative frequency
-    print(df2[df2['WORDtag'] == tag]['WORDtag'].value_counts()) #Finegrained POS tags
+    print(df2[df2['WORDtag'] == tag]['WORDpos'].value_counts()) #Finegrained POS tags
     print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().head(3)) #3 most frequent token with this tag
     print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().tail(1)) #least frequent token with this tag
 
@@ -88,11 +91,11 @@ bigrams_pos = list(get_ngrams(doc, 2, use_pos=True))
 trigrams_pos = list(get_ngrams(doc, 3, use_pos=True))
 
 # n-gram occurences
-print(Counter(bigrams))
-print(Counter(trigrams))
+print(Counter(bigrams).most_common(3))
+print(Counter(trigrams).most_common(3))
 # pos n-gram occurences
-print(Counter(bigrams_pos))
-print(Counter(trigrams_pos))
+print(Counter(bigrams_pos).most_common(3))
+print(Counter(trigrams_pos).most_common(3))
 
 # 4. Lemmatization -----------------------------------------------------------------------------------------------------
 LEMtoken = []
