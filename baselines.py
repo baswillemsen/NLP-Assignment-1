@@ -5,6 +5,7 @@
 # Frequency baseline: determines the class based on a frequency threshold
 
 # Each baseline returns predictions for the test data. The length and frequency baselines determine a threshold using the development data.
+import numpy as np
 import pandas as pd
 from wordfreq import word_frequency
 import random

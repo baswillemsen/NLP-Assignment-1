@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import spacy
 nlp = spacy.load("en_core_web_sm")
 
-
 col_names = ['id', 'sentence', 'target_start', 'target_end', 'target_words', 'num_native', 'num_non_native',
              'difficult_native', 'difficult_non_native', 'label_bin', 'label_prob']
 df = pd.read_csv('data/original/english/WikiNews_Train.tsv', sep='\t', names=col_names)
