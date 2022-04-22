@@ -48,18 +48,18 @@ for token in doc:
     WORDtoken.append(token.text)
     WORDpos.append(token.pos_)
     WORDtag.append(token.tag_)
-df2 = pd.DataFrame({"WORDtoken": WORDtoken,"WORDpos": WORDpos,"WORDtag": WORDtag}) #all results in df2
+df2 = pd.DataFrame({"WORDtoken": WORDtoken,"WORDpos": WORDpos,"WORDtag": WORDtag})  # all results in df2
 
-print(df2['WORDtag'].value_counts().head(10)) #number of tags per POS tag
-print(df2['WORDtag'].value_counts().sum()) #total number of POS tags
+print(df2['WORDtag'].value_counts().head(10))  # number of tags per POS tag
+print(df2['WORDtag'].value_counts().sum())  # total number of POS tags
 
 top10POStags = ['NN','NNP','IN','DT','JJ','NNS',',','VBD','.','_SP']
 for tag in top10POStags:
     print(tag, ': \n')
-    print(df2[df2['WORDtag'] == tag]['WORDtoken'].count() / num_tokens) #relative frequency
-    print(df2[df2['WORDtag'] == tag]['WORDpos'].value_counts()) #Finegrained POS tags
-    print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().head(3)) #3 most frequent token with this tag
-    print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().tail(1)) #least frequent token with this tag
+    print(df2[df2['WORDtag'] == tag]['WORDtoken'].count() / num_tokens)  # relative frequency
+    print(df2[df2['WORDtag'] == tag]['WORDpos'].value_counts())  # Finegrained POS tags
+    print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().head(3))  # 3 most frequent token with this tag
+    print(df2[df2['WORDtag'] == tag]['WORDtoken'].value_counts().tail(1))  # least frequent token with this tag
 
 # 3. N-grams -----------------------------------------------------------------------------------------------------------
 def get_ngrams(doc, n, filter_punct=False, use_pos=False):
