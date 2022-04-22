@@ -60,9 +60,17 @@ print(df8)
 print(np.corrcoef(df8['token_length'], df8['label_prob'])[0, 1])  # corr token length and perceived complexity word
 print(np.corrcoef(df8['word_freq'], df8['label_prob'])[0, 1])  # corr word frequency and perceived complexity word
 
+print(np.corrcoef(df8['token_length'], df8['word_freq'])[0, 1])  # corr word length and frequency
+
 plt.scatter(df8['token_length'], df8['label_prob'])
+plt.xlabel('word length')
+plt.ylabel('prob complexity label')
 plt.clf
 plt.scatter(df8['word_freq'], df8['label_prob'])
+plt.xlabel('word frequency')
+plt.ylabel('prob complexity label')
 plt.clf()
-plt.scatter(df8['word_freq'], df8['pos_tag'])
+plt.scatter(df8['pos_tag'], df8['label_prob'])
+plt.xlabel('POS-tag')
+plt.ylabel('prob complexity label')
 plt.clf()
